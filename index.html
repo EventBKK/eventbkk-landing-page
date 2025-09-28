@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EVENTBKK</title>
+  <meta name="description" content="EVENTBKK – Bangkok’s next-generation event and media platform is coming.">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Roboto:wght@300;500&display=swap" rel="stylesheet">
+  <style>
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      color: white;
+      text-align: center;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .city-bg-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .city-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: center/cover no-repeat;
+      filter: blur(0px) brightness(0.5);
+      opacity: 0;
+      transition: opacity 1.5s ease-in-out;
+    }
+
+    .city-bg.active {
+      opacity: 1;
+    }
+
+    /* Logo and text */
+    h1.logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
+      letter-spacing: 3px;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeIn 2s ease forwards;
+      z-index: 2;
+    }
+
+    .launch-date {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2rem, 6vw, 4rem);
+      font-weight: 600;
+      letter-spacing: 5px;
+      margin-bottom: 1rem;
+      opacity: 0;
+      text-shadow: 0 0 10px #00f2ff, 0 0 20px #00c6ff, 0 0 40px #00f2ff;
+      animation: fadeIn 2s ease forwards 1s, glow 2s infinite alternate;
+      z-index: 2;
+    }
+
+    .subtext {
+      font-size: clamp(0.9rem, 3vw, 1.3rem);
+      color: #ddd;
+      opacity: 0;
+      animation: fadeIn 2s ease forwards 2s;
+      z-index: 2;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes glow {
+      from { text-shadow: 0 0 5px #00f2ff, 0 0 10px #00c6ff; }
+      to { text-shadow: 0 0 15px #00f2ff, 0 0 30px #00c6ff, 0 0 45px #00f2ff; }
+    }
+
+    canvas#particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    .photo-credit {
+      position: absolute;
+      bottom: 0.7rem;
+      right: 0.7rem;
+      font-size: clamp(0.5rem, 1.5vw, 0.7rem);
+      color: rgba(255, 255, 255, 0.7);
+      z-index: 3;
+      font-family: 'Roboto', sans-serif;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="city-bg-container">
+    <div class="city-bg active" style="background-image: url('https://github.com/EventBKK/eventbkk-landing-page/blob/main/Assets/bangkok-business-district-cityscape-with-skyscraper-twilight-thailand-panorama.jpg?raw=true')"></div>
+    <div class="city-bg" style="background-image: url('https://github.com/EventBKK/eventbkk-landing-page/blob/main/Assets/cityscape-bangkok-thailand-2048x1365.jpg?raw=true')"></div>
+    <div class="city-bg" style="background-image: url('https://github.com/EventBKK/eventbkk-landing-page/blob/main/Assets/large-suspension-bridge-chao-phraya-river-twilight-with-city-background.jpg?raw=true')"></div>
+  </div>
+
+  <h1 class="logo">EVENTBKK</h1>
+  <div class="launch-date">27.12.2025</div>
+  <div class="subtext">Coming Soon...</div>
+
+  <canvas id="particles"></canvas>
+
+  <div class="photo-credit">Photo by Wiroj Sidhisoradej on Freepik</div>
+
+  <script>
+
+    const canvas = document.getElementById("particles");
+    const ctx = canvas.getContext("2d");
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const particles = [];
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = canvas.height + Math.random() * 100;
+        this.size = Math.random() * 2 + 1;
+        this.speed = Math.random() * 1 + 0.5;
+        this.color = `rgba(0, ${150 + Math.random()*100}, 255, ${Math.random()})`;
+      }
+      update() {
+        this.y -= this.speed;
+        if (this.y < -this.size) {
+          this.y = canvas.height + this.size;
+          this.x = Math.random() * canvas.width;
+        }
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+      }
+    }
+
+    function initParticles() {
+      for(let i=0; i<100; i++) {
+        particles.push(new Particle());
+      }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => { p.update(); p.draw(); });
+      requestAnimationFrame(animate);
+    }
+
+    initParticles();
+    animate();
+
+    const bgDivs = document.querySelectorAll('.city-bg');
+    let currentIndex = 0;
+
+    function changeBackground() {
+      bgDivs[currentIndex].classList.remove('active');
+      currentIndex = (currentIndex + 1) % bgDivs.length;
+      bgDivs[currentIndex].classList.add('active');
+    }
+
+    setInterval(changeBackground, 30000);
+  </script>
+</body>
+</html>
